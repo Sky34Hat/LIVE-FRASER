@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard Teleprompter • Sky Hat</title>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --text: #00ffcc;
+      --font: 'Courier New', monospace;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #container {
+      flex: 1;
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #screen {
+      white-space: nowrap;
+      font-size: 64px;
+      font-weight: bold;
+      animation: scrollText linear infinite;
+    }
+
+    @keyframes scrollText {
+      from { transform: translateX(100%); }
+      to { transform: translateX(-100%); }
+    }
+
+    textarea {
+      position: fixed;
+      top: -9999px; /* escondido, mas ativo */
+    }
+
+    /* Dashboard */
+    #dashboard {
+      background: #111827;
+      padding: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+      border-top: 2px solid #1f2937;
+    }
+
+    .control {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      color: #f3f4f6;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    input[type="range"], input[type="color"], select {
+      width: 180px;
+    }
+  </style>
+</head>
+<body>
+  <textarea id="input" autofocus></textarea>
+  <div id="container">
+    <div id="screen">Digite algo…</div>
+  </div>
+
+  <div id="dashboard">
+    <div class="control">
+      <label for="speedRange">Velocidade</label>
+      <input type="range" id="speedRange" min="5" max="30" value="15">
+    </div>
+
+    <div class="control">
+      <label for="fontSize">Tamanho</label>
+      <input type="range" id="fontSize" min="24" max="120" value="64">
+    </div>
+
+    <div class="control">
+      <label for="colorPicker">Cor do Texto</label>
+      <input type="color" id="colorPicker" value="#00ffcc">
+    </div>
+
+    <div class="control">
+      <label for="bgColor">Cor do Fundo</label>
+      <input type="color" id="bgColor" value="#0a0a0f">
+    </div>
+
+    <div class="control">
+      <label for="direction">Direção</label>
+      <select id="direction">
+        <option value="left">Esquerda</option>
+        <option value="right">Direita</option>
+      </select>
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById('input');
+    const screen = document.getElementById('screen');
+    const speedRange = document.getElementById('speedRange');
+    const fontSize = document.getElementById('fontSize');
+    const colorPicker = document.getElementById('colorPicker');
+    const bgColor = document.getElementById('bgColor');
+    const direction = document.getElementById('direction');
+
+    // Sempre foca no input invisível
+    window.addEventListener('click', () => input.focus());
+
+    input.addEventListener('input', () => {
+      const value = input.value;
+      screen.textContent = value.length ? value : 'Digite algo…';
+    });
+
+    // Velocidade
+    function updateSpeed() {
+      screen.style.animationDuration = speedRange.value + 's';
+    }
+    speedRange.addEventListener('input', updateSpeed);
+    updateSpeed();
+
+    // Tamanho
+    fontSize.addEventListener('input', () => {
+      screen.style.fontSize = fontSize.value + 'px';
+    });
+
+    // Cor do texto
+    colorPicker.addEventListener('input', () => {
+      screen.style.color = colorPicker.value;
+    });
+
+    // Cor do fundo
+    bgColor.addEventListener('input', () => {
+      document.body.style.background = bgColor.value;
+    });
+
+    // Direção
+    direction.addEventListener('change', () => {
+      if (direction.value === 'left') {
+        screen.style.animationName = 'scrollText';
+      } else {
+        screen.style.animationName = 'scrollTextReverse';
+      }
+    });
+
+    // Animação reversa
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes scrollTextReverse {
+        from { transform: translateX(-100%); }
+        to { transform: translateX(100%); }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>
